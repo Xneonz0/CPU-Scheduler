@@ -91,13 +91,20 @@ class SchedulerGUI:
             for entry in self.entries:
                 if not entry.get().strip().isdigit():
                     raise ValueError("All fields must be valid integers.")
-
+    
             pid, arrival, burst, queue = (int(e.get()) for e in self.entries)
-
+    
             # Validate queue value
             if queue not in [1, 2, 3]:
                 raise ValueError("Queue must be 1, 2, or 3.")
-
+    
+            # Check for duplicate Process ID
+            for process in (list(self.scheduler.high_priority_queue) +
+                            list(self.scheduler.medium_priority_queue) +
+                            list(self.scheduler.low_priority_queue)):
+                if process.pid == pid:
+                    raise ValueError(f"Process ID {pid} already exists!")
+    
             # Add the process to the scheduler
             process = Process(pid, arrival, burst, queue)
             if self.scheduler.add_process(process):
