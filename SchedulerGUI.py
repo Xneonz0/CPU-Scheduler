@@ -91,20 +91,20 @@ class SchedulerGUI:
             for entry in self.entries:
                 if not entry.get().strip().isdigit():
                     raise ValueError("All fields must be valid integers.")
-    
+
             pid, arrival, burst, queue = (int(e.get()) for e in self.entries)
-    
+
             # Validate queue value
             if queue not in [1, 2, 3]:
                 raise ValueError("Queue must be 1, 2, or 3.")
-    
+
             # Check for duplicate Process ID
             for process in (list(self.scheduler.high_priority_queue) +
                             list(self.scheduler.medium_priority_queue) +
                             list(self.scheduler.low_priority_queue)):
                 if process.pid == pid:
                     raise ValueError(f"Process ID {pid} already exists!")
-    
+
             # Add the process to the scheduler
             process = Process(pid, arrival, burst, queue)
             if self.scheduler.add_process(process):
@@ -116,7 +116,7 @@ class SchedulerGUI:
 
     def schedule(self):
         try:
-            # Update time quantum and process limit dynamically, or use defaults if fields are empty
+            # Update time quantum and process limit dynamically
             new_time_quantum = int(self.time_quantum_entry.get()) if self.time_quantum_entry.get().strip() else self.scheduler.time_quantum
             new_process_limit = int(self.process_limit_entry.get()) if self.process_limit_entry.get().strip() else self.scheduler.process_limit
 
@@ -161,15 +161,31 @@ class SchedulerGUI:
         priorities = [p.queue for p in self.scheduler.completed_processes]
 
         colors = {1: "#FF6F61", 2: "#6B5B95", 3: "#88B04B"}
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        fig.patch.set_facecolor("#2E3440")  # Dark background for Gantt chart
+        ax.set_facecolor("#2E3440")
+        ax.tick_params(colors="#D8DEE9")
+        ax.spines['top'].set_color("#000000")
+        ax.spines['bottom'].set_color("#000000")
+        ax.spines['left'].set_color("#000000")
+        ax.spines['right'].set_color("#000000")
+        ax.spines['top'].set_linewidth(2)
+        ax.spines['bottom'].set_linewidth(2)
+        ax.spines['left'].set_linewidth(2)
+        ax.spines['right'].set_linewidth(2)
+
         plt.barh(labels, durations, left=start_times, color=[colors[p] for p in priorities])
-        plt.xlabel("Time")
-        plt.ylabel("Processes")
-        plt.title("Gantt Chart: Process Execution Timeline")
+        plt.xlabel("Time", color="#D8DEE9")
+        plt.ylabel("Processes", color="#D8DEE9")
+        plt.title("Gantt Chart: Process Execution Timeline", color="#D8DEE9")
+        plt.grid(color="#B0B0B0", linewidth=0.8)  # Enhanced visibility for gridlines
+
         plt.legend(handles=[
             plt.Rectangle((0, 0), 1, 1, color=colors[1], label="High Priority"),
             plt.Rectangle((0, 0), 1, 1, color=colors[2], label="Medium Priority"),
             plt.Rectangle((0, 0), 1, 1, color=colors[3], label="Low Priority")
-        ])
+        ], facecolor="#2E3440", edgecolor="#434C5E", labelcolor="#D8DEE9")
         plt.show()
 
     def reset_scheduler(self):
