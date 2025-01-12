@@ -103,22 +103,26 @@ class SchedulerGUI:
     def add_process(self):
         try:
             # Gather and validate process details from user inputs
-            for entry in self.entries:
+            for entry, label in zip(self.entries, ["Process ID", "Arrival Time", "Burst Time", "Queue", "Priority"]):
+                if not entry.get().strip():
+                    raise ValueError(f"{label} cannot be empty. Please provide a valid value.")
                 if not entry.get().strip().isdigit():
-                    raise ValueError("All fields must be valid integers.")
+                    raise ValueError(f"{label} must be a valid integer.")
 
             pid, arrival, burst, queue, priority = (int(e.get()) for e in self.entries)
 
             # Ensure Queue and Priority values are within valid ranges
-            if queue not in [1, 2, 3] or priority not in [1, 2, 3]:
-                raise ValueError("Queue and Priority must be 1, 2, or 3.")
+            if queue not in [1, 2, 3]:
+                raise ValueError("Queue must be 1 (High Priority), 2 (Medium Priority), or 3 (Low Priority).")
+            if priority not in [1, 2, 3]:
+                raise ValueError("Priority must be 1 (High), 2 (Medium), or 3 (Low).")
 
             # Check if the process ID already exists
             for process in (list(self.scheduler.high_priority_queue) +
                             list(self.scheduler.medium_priority_queue) +
                             list(self.scheduler.low_priority_queue)):
                 if process.pid == pid:
-                    raise ValueError(f"Process ID {pid} already exists!")
+                    raise ValueError(f"Process ID {pid} already exists! Please use a unique ID.")
 
             # Add the process to the scheduler
             process = Process(pid, arrival, burst, queue, priority=priority)
@@ -127,7 +131,7 @@ class SchedulerGUI:
             else:
                 messagebox.showerror("Error", "Process limit reached!")
         except ValueError as e:
-            messagebox.showerror("Input Error", f"Invalid input: {e}")
+            messagebox.showerror("Input Error", str(e))
 
     def schedule(self):
         try:
@@ -219,4 +223,7 @@ class SchedulerGUI:
         """Clear the current state and reset the scheduler."""
         self.scheduler.reset_scheduler()  # Clear the internal scheduler state
         self.metrics_text.delete("1.0", tk.END)  # Clear the metrics display box
+        #Deletes the saved input states
+        for entry in self.entries:
+            entry.delete(0, tk.END)
         messagebox.showinfo("Success", "Scheduler has been reset!")
