@@ -38,17 +38,24 @@ class MultiQueueScheduler:
         """Schedule processes in all queues using the appropriate algorithm."""
         current_time = 0
 
-        # High Priority Queue (FCFS)
+        # High Priority Queue (Preemptive Priority Scheduling)
         while self.high_priority_queue:
+            self.high_priority_queue = deque(sorted(self.high_priority_queue, key=lambda p: (p.priority, p.arrival)))
             process = self.high_priority_queue.popleft()
             if current_time < process.arrival:
                 current_time = process.arrival
-            process.start_time = current_time
-            process.finish_time = process.start_time + process.burst
-            process.waiting_time = process.start_time - process.arrival
-            process.turnaround_time = process.finish_time - process.arrival
-            current_time = process.finish_time
-            self.completed_processes.append(process)
+            if process.remaining_time > 0:
+                execution_time = min(process.remaining_time, self.time_quantum)
+                process.start_time = process.start_time if process.start_time else current_time
+                process.remaining_time -= execution_time
+                current_time += execution_time
+                if process.remaining_time > 0:
+                    self.high_priority_queue.append(process)
+                else:
+                    process.finish_time = current_time
+                    process.waiting_time = process.finish_time - process.arrival - process.burst
+                    process.turnaround_time = process.finish_time - process.arrival
+                    self.completed_processes.append(process)
 
         # Medium Priority Queue (Round Robin)
         while self.medium_priority_queue:
@@ -70,16 +77,17 @@ class MultiQueueScheduler:
                     self.completed_processes.append(process)
             self.medium_priority_queue = temp_queue
 
-        # Low Priority Queue (FCFS)
+        # Low Priority Queue (Shortest Job First - SJF)
         while self.low_priority_queue:
+            self.low_priority_queue = deque(sorted(self.low_priority_queue, key=lambda p: (p.burst, p.arrival)))
             process = self.low_priority_queue.popleft()
             if current_time < process.arrival:
                 current_time = process.arrival
             process.start_time = current_time
-            process.finish_time = process.start_time + process.burst
-            process.waiting_time = process.start_time - process.arrival
+            current_time += process.burst
+            process.finish_time = current_time
+            process.waiting_time = process.finish_time - process.arrival - process.burst
             process.turnaround_time = process.finish_time - process.arrival
-            current_time = process.finish_time
             self.completed_processes.append(process)
 
     def calculate_metrics(self):
