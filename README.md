@@ -34,6 +34,19 @@ This project demonstrates the implementation of **Multilevel Queue Scheduling**,
 
 ---
 
+## Summary Table: Scheduling Algorithms
+
+| **Algorithm**               | **Best For**                           | **Worst For**                      | **Key Issue**                |
+|-----------------------------|----------------------------------------|-------------------------------------|-----------------------------|
+| **Shortest-Job-First (SJF)** | Low turnaround time, batch systems     | Processes with unpredictable burst | Starvation for long jobs    |
+| **Priority Scheduling**      | Critical or high-priority processes    | Low-priority processes             | Starvation, priority tuning |
+| **Round Robin (RR)**         | Time-sharing, interactive systems      | High overhead systems              | Context switching overhead  |
+| **Multilevel Feedback Queue**| Mixed workloads, adaptive systems      | Complex systems                    | Implementation complexity   |
+| **Multilevel Queue**         | Distinct priority categories           | Systems requiring flexibility      | Rigidity in queue movement  |
+| **First-Come-First-Served (FCFS)** | Simple environments, short workloads   | Mixed workload environments        | Convoy effect               |
+
+---
+
 ### Prerequisites
 
 - **Python 3.x**
