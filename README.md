@@ -163,7 +163,7 @@ python main.py
   - `MultiQueueScheduler`: Manages the scheduling logic and metrics calculation.
   - `SchedulerGUI`: Provides a graphical interface for user interaction.
 
-### Impressive Python Concepts Used
+### Python Concepts Used
 - **Object-Oriented Programming (OOP)**:
   - Encapsulation and separation of concerns using distinct classes for processes, scheduling logic, and GUI.
 - **Data Structures**:
